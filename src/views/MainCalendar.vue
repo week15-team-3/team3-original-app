@@ -27,12 +27,14 @@
             {{ day.day }}
             <div v-for="dayEvent in day.dayEvents" :key="dayEvent.id">
               <div
+                v-if="dayEvent.width"
                 class="calendar-event"
                 :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
                 draggable="true"
               >
                 {{ dayEvent.name }}
               </div>
+              <div v-else style="height: 26px"></div>
             </div>
           </div>
         </div>
@@ -231,27 +233,77 @@ export default {
       return week[dayIndex]
     },
     getDayEvents(date, day) {
+      let stackIndex = 0
       let dayEvents = []
-      this.events.forEach((event) => {
+      let startedEvents = []
+      this.sortedEvents.forEach((event) => {
         let startDate = moment(event.start).format("YYYY-MM-DD")
         let endDate = moment(event.end).format("YYYY-MM-DD")
         let Date = date.format("YYYY-MM-DD")
 
-        if (startDate == Date) {
-          let width = this.getEventWidth(startDate, endDate, day) * 100 + 95
-
-          dayEvents.push({ ...event, width })
+        if (startDate <= Date && endDate >= Date) {
+          if (startDate === Date) {
+            // eslint-disable-next-line
+            ;[stackIndex, dayEvents] = this.getStackEvents(
+              event,
+              day,
+              stackIndex,
+              dayEvents,
+              startedEvents,
+              event.start
+            )
+          } else if (day === 0) {
+            // eslint-disable-next-line
+            ;[stackIndex, dayEvents] = this.getStackEvents(
+              event,
+              day,
+              stackIndex,
+              dayEvents,
+              startedEvents,
+              Date
+            )
+          } else {
+            startedEvents.push(event)
+          }
         }
       })
       return dayEvents
     },
-    getEventWidth(end, start, day) {
+    getEventWidth(start, end, day) {
       let betweenDays = moment(end).diff(moment(start), "days")
       if (betweenDays > 6 - day) {
         return (6 - day) * 100 + 95
       } else {
         return betweenDays * 100 + 95
       }
+    },
+    getStackEvents(event, day, stackIndex, dayEvents, startedEvents, start) {
+      //eslint-disable-next-line
+      ;[stackIndex, dayEvents] = this.getStartedEvents(
+        stackIndex,
+        startedEvents,
+        dayEvents
+      )
+      let width = this.getEventWidth(start, event.end, day)
+      Object.assign(event, {
+        stackIndex,
+      })
+      dayEvents.push({ ...event, width })
+      stackIndex++
+      return [stackIndex, dayEvents]
+    },
+    getStartedEvents(stackIndex, startedEvents, dayEvents) {
+      let startedEvent
+      do {
+        startedEvent = startedEvents.find(
+          (event) => event.stackIndex === stackIndex
+        )
+        if (startedEvent) {
+          dayEvents.push(startedEvent) // ダミー領域として利用するため
+          stackIndex++
+        }
+      } while (typeof startedEvent !== "undefined")
+      return [stackIndex, dayEvents]
     },
   },
   computed: {
@@ -263,6 +315,15 @@ export default {
     },
     currentMonth() {
       return this.currentDate.format("YYYY-MM")
+    },
+    sortedEvents() {
+      return this.events.slice().sort(function (a, b) {
+        let startDate = moment(a.start).format("YYYY-MM-DD")
+        let startDate_2 = moment(b.start).format("YYYY-MM-DD")
+        if (startDate < startDate_2) return -1
+        if (startDate > startDate_2) return 1
+        return 0
+      })
     },
   },
 }

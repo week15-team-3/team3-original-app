@@ -1,3 +1,6 @@
+<!-- 参考サイト①:https://reffect.co.jp/vue/javascript-vue-js-create-calendar#i-8 -->
+<!-- 参考サイト②:https://reffect.co.jp/vue/vue-js-original-calendar -->
+
 <template>
   <div class="content">
     <h1>メインカレンダー</h1>
@@ -22,6 +25,8 @@
           :class="{ outside: currentMonth !== day.month }"
           v-for="(day, index) in week"
           :key="index"
+          @drop="dragEnd($event, day.date)"
+          @dragover.prevent
         >
           <div class="calendar-day">
             {{ day.day }}
@@ -31,6 +36,7 @@
                 class="calendar-event"
                 :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
                 draggable="true"
+                @dragstart="dragStart($event, dayEvent.id)"
               >
                 {{ dayEvent.name }}
               </div>
@@ -213,7 +219,8 @@ export default {
           weekRow.push({
             day: calendarDate.get("date"),
             month: calendarDate.format("YYYY-MM"),
-            dayEvents,
+            date: calendarDate.format("YYYY-MM-DD"),
+            dayEvents: dayEvents,
           })
           calendarDate.add(1, "days")
         }
@@ -305,6 +312,23 @@ export default {
       } while (typeof startedEvent !== "undefined")
       return [stackIndex, dayEvents]
     },
+    dragStart(event, eventId) {
+      event.dataTransfer.effectAllowed = "move"
+      event.dataTransfer.dropEffect = "move"
+      event.dataTransfer.setData("eventId", eventId)
+    },
+    dragEnd(event, date) {
+      let eventId = event.dataTransfer.getData("eventId")
+      let dragEvent = this.events.find((event) => event.id == eventId)
+      let betweenDays = moment(dragEvent.end).diff(
+        moment(dragEvent.start),
+        "days"
+      )
+      dragEvent.start = date
+      dragEvent.end = moment(dragEvent.start)
+        .add(betweenDays, "days")
+        .format("YYYY-MM-DD")
+    },
   },
   computed: {
     calendars() {
@@ -375,5 +399,9 @@ export default {
   margin-bottom: 1px;
   height: 25px;
   line-height: 25px;
+  position: relative;
+  z-index: 1;
+  border-radius: 4px;
+  padding-left: 4px;
 }
 </style>

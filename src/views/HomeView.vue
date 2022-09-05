@@ -1,15 +1,19 @@
 <template>
   <div v-if="logInOut === false">
     <button @click="SignIn">Googleアカウントでログイン</button>
+
+    <div @click="SignIn2">click</div>
+    <div id="login-container"></div>
   </div>
 
   <div v-else>
     <button @click="SignOut">ログアウト</button>
 
     <div>ようこそ</div>
-    <div>{{ userData[0].name }}さん、こんにちは</div>
+    <div>{{ showUser.name }}さん、こんにちは</div>
   </div>
 </template>
+
 <script>
 import {
   getAuth,
@@ -17,21 +21,20 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth"
-import { db } from "./firebase"
+import { db } from "../firebase"
 import { setDoc, doc, getDoc } from "firebase/firestore"
-
 export default {
   data() {
     return {
       logInOut: false,
       userData: [],
+      showUser: [],
     }
   },
   methods: {
     SignIn: async function () {
       // クリックしたらgoogleアカウントでサインイン。userのデータをsetUserでfirebaseに登録。
       const provider = new GoogleAuthProvider()
-
       const auth = getAuth()
       await signInWithPopup(auth, provider)
         .then((result) => {
@@ -42,16 +45,21 @@ export default {
           // console.log(credential)
           // console.log(token)
           // console.log(user)
-
           this.setUser(user)
           this.getUserData(user)
+          console.log(user)
         })
         .catch((error) => {
           console.error(error)
         })
       this.logInOut = !this.logInOut
     },
-
+    // SignIn2: async function () {
+    //   const ui = new firebaseui.auth.AuthUI(firebase.auth())
+    //   ui.start("#login-container", {
+    //     signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+    //   })
+    // },
     SignOut: async function () {
       const auth = getAuth()
       await signOut(auth)
@@ -63,27 +71,22 @@ export default {
         })
       this.logInOut = !this.logInOut
     },
-
     setUser(user) {
-      //users、googleアカウントの表示名でデータをfirebaseに保管
       setDoc(doc(db, "users", user.displayName), {
         userName: user.displayName,
         ID: user.uid,
       })
     },
-
     getUserData: async function (user) {
-      //ログインするとfirebaseのusersにsetDocで保存したdisplayNameからデータを取得
       const docRef = doc(db, "users", user.displayName)
       const docSnap = await getDoc(docRef)
       this.userData.push({
-        name: docSnap.data().userName, //ここではuserNameとIDのみ
+        name: docSnap.data().userName,
         id: docSnap.data().ID,
       })
-
-      console.log(docSnap.data())
-      console.log(this.userData[0].name) //concole.log(userData)をするとProxy()と表示されたが[0]をつけると取り出せた。
-      //まだよくわかっていないので改良の余地あり
+      // ロード時はuserDataが空なのでエラーになる。
+      this.showUser.name = this.userData[0].name
+      console.log(this.showUser)
     },
   },
 }

@@ -2,7 +2,8 @@
 import { createRouter, createWebHistory } from "vue-router"
 import HomeView from "../views/HomeView.vue"
 import SalaryView from "../views/SalaryView.vue"
-import MainCalendar from "../views/MainCalendar.vue"
+import MainCalendar from "../views/MainCalendarView.vue"
+import RegisterWorkView from "../views/RegisterWorkView.vue"
 
 const routes = [
   {
@@ -25,6 +26,11 @@ const routes = [
     name: "about",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+  },
+  {
+    path: "/registerwork",
+    name: "registerWork",
+    component: RegisterWorkView,
   },
 ]
 

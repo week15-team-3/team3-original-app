@@ -46,6 +46,26 @@
         </div>
       </div>
     </div>
+    <div class="register-shift">
+      <h2>シフトの登録</h2>
+      <div class="shift-input-area">
+        <div class="shift_name-input-area">
+          シフトの名前：<input class="shift_name-input-field" type="text" />
+        </div>
+        <div class="shift_startTime-input-area">
+          シフト開始時刻：<input
+            class="shift_startTime-input-field"
+            type="datetime-local"
+          />
+        </div>
+        <div class="shift_endTime-input-area">
+          シフト終了時刻：<input
+            class="shift_endTime-input-field"
+            type="datetime-local"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -356,7 +376,7 @@ export default {
 <style>
 .content {
   margin: 2em auto;
-  width: 900px;
+  width: 100%;
 }
 .button-area {
   margin: 0.5em 0;
@@ -403,5 +423,8 @@ export default {
   z-index: 1;
   border-radius: 4px;
   padding-left: 4px;
+}
+.register-shift {
+  border: solid 3px;
 }
 </style>

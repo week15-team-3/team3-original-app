@@ -17,7 +17,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth"
-import { db } from "./firebase"
+import { db } from "../firebase"
 import { setDoc, doc, getDoc } from "firebase/firestore"
 
 export default {

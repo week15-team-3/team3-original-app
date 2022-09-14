@@ -399,10 +399,10 @@ export default {
       }
     },
     registerShift() {
-      let eventLength = this.event.length
-      this.event.push({
-        id: eventLength + 1,
-        name: this.ShiftName,
+      let eventsLength = this.events.length
+      this.events.push({
+        id: eventsLength + 1,
+        name: this.shiftName,
         start: this.shiftStartAt,
         end: this.shiftEndAt,
         color: "blue",

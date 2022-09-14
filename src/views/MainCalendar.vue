@@ -108,7 +108,22 @@
 </template>
 
 <script>
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  arrayUnion,
+  updateDoc,
+} from "firebase/firestore"
+import { getAuth } from "firebase/auth"
 import moment from "moment"
+
+const db = getFirestore()
+const auth = getAuth()
+const user = auth.currentUser
+const userName = user.displayName
+const userData = doc(db, "users", userName)
+
 export default {
   data() {
     return {
@@ -252,6 +267,10 @@ export default {
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
+      // auth: null,
+      // user: null,
+      // userName: null,
+      // useData: null,
     }
   },
   methods: {
@@ -398,6 +417,18 @@ export default {
         this.weeklyCalendarButton[index] = true
       }
     },
+    async addShiftToFirebase() {
+      await updateDoc(userData, {
+        events: arrayUnion({
+          id: "",
+          name: this.shiftName,
+          start: this.shiftStartAt,
+          end: this.shiftEndAt,
+          color: "blue",
+        }),
+      }),
+        console.log()
+    },
     registerShift() {
       let eventsLength = this.events.length
       this.events.push({
@@ -407,6 +438,7 @@ export default {
         end: this.shiftEndAt,
         color: "blue",
       })
+      this.addShiftToFirebase()
     },
   },
   computed: {
@@ -428,6 +460,15 @@ export default {
         return 0
       })
     },
+  },
+  async created() {
+    await setDoc(
+      userData,
+      {
+        events: [],
+      },
+      { merge: true }
+    )
   },
 }
 </script>

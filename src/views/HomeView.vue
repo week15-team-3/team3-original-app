@@ -250,27 +250,26 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  onAuthStateChanged,
 } from "firebase/auth"
 import { db } from "../firebase"
 import { setDoc, doc, getDoc } from "firebase/firestore"
 
-// var firebase = require("./firebase")
-// var firebaseui = require("firebaseui")
-
-// const uiConfig = {
-//   signInSuccessUrl: "/",
-//   signInOptions: [
-//     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-//     firebase.auth.EmailAuthProvider.PROVIDER_ID,
-//   ],
-// }
-
-// const ui = new firebaseui.auth.AuthUI(firebase.auth())
-// ui.start("#firebaseui-auth-container", uiConfig)
-
 export default {
   name: "PageIndex",
-
+  mounted() {
+    const auth = getAuth()
+    // const user = auth.currentUser
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.logInOut = true
+        const currentUserData = this.getUserData(user)
+        console.log(currentUserData)
+      } else {
+        this.logInOut = false
+      }
+    })
+  },
   data() {
     return {
       logInOut: false,
@@ -278,6 +277,7 @@ export default {
       showUser: [],
     }
   },
+
   methods: {
     SignIn: async function () {
       // クリックしたらgoogleアカウントでサインイン。userのデータをsetUserでfirebaseに登録。
@@ -289,13 +289,13 @@ export default {
           const user = result.user
 
           this.setUser(user)
-          this.getUserData(user)
+          // this.getUserData(user)
           console.log(user)
         })
         .catch((error) => {
           console.error(error)
         })
-      this.logInOut = !this.logInOut
+      // this.logInOut = !this.logInOut
     },
 
     SignOut: async function () {
@@ -307,7 +307,7 @@ export default {
         .catch((error) => {
           console.log(error)
         })
-      this.logInOut = !this.logInOut
+      // this.logInOut = !this.logInOut
     },
 
     setUser(user) {

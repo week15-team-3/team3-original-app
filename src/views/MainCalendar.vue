@@ -15,33 +15,60 @@
           {{ youbi(n - 1) }}
         </div>
       </div>
-      <div
-        class="calendar-weekly"
-        v-for="(week, index) in calendars"
-        :key="index"
-      >
-        <div
-          class="calendar-daily"
-          :class="{ outside: currentMonth !== day.month }"
-          v-for="(day, index) in week"
-          :key="index"
-          @drop="dragEnd($event, day.date)"
-          @dragover.prevent
-        >
-          <div class="calendar-day">
-            {{ day.day }}
-            <div v-for="dayEvent in day.dayEvents" :key="dayEvent.id">
-              <div
-                v-if="dayEvent.width"
-                class="calendar-event"
-                :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
-                draggable="true"
-                @dragstart="dragStart($event, dayEvent.id)"
-              >
-                {{ dayEvent.name }}
+      <div v-for="(week, index) in calendars" :key="index">
+        <div class="calendar-weekly">
+          <div
+            class="calendar-daily"
+            :class="{ outside: currentMonth !== day.month }"
+            v-for="(day, index) in week"
+            :key="index"
+            @drop="dragEnd($event, day.date)"
+            @dragover.prevent
+          >
+            <div class="calendar-day">
+              {{ day.day }}
+              <div v-for="dayEvent in day.dayEvents" :key="dayEvent.id">
+                <div
+                  v-if="dayEvent.width"
+                  class="calendar-event"
+                  :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
+                  draggable="true"
+                  @dragstart="dragStart($event, dayEvent.id)"
+                >
+                  {{ dayEvent.name }}
+                </div>
+                <div v-else style="height: 26px"></div>
               </div>
-              <div v-else style="height: 26px"></div>
             </div>
+          </div>
+        </div>
+        <button @click="weeklyCalendarButtonChange(index)">週カレンダー</button>
+        <div
+          class="weekly-calendar-frame calendar-weekly"
+          v-if="weeklyCalendarButton[index]"
+        >
+          <div id="time-zero">00:00</div>
+          <div class="calendar-left-bar">
+            <div class="calendar-left-bar-content">02:00</div>
+            <div class="calendar-left-bar-content">04:00</div>
+            <div class="calendar-left-bar-content">06:00</div>
+            <div class="calendar-left-bar-content">08:00</div>
+            <div class="calendar-left-bar-content">10:00</div>
+            <div class="calendar-left-bar-content">12:00</div>
+            <div class="calendar-left-bar-content">14:00</div>
+            <div class="calendar-left-bar-content">16:00</div>
+            <div class="calendar-left-bar-content">18:00</div>
+            <div class="calendar-left-bar-content">20:00</div>
+            <div class="calendar-left-bar-content">22:00</div>
+            <div class="calendar-left-bar-content">24:00</div>
+          </div>
+
+          <div
+            class="weekly-calendar-day calendar-daily"
+            v-for="n in 7"
+            :key="n"
+          >
+            <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div>
           </div>
         </div>
       </div>
@@ -50,20 +77,31 @@
       <h2>シフトの登録</h2>
       <div class="shift-input-area">
         <div class="shift_name-input-area">
-          シフトの名前：<input class="shift_name-input-field" type="text" />
+          シフトの名前(メモ)：<input
+            class="shift_name-input-field"
+            type="text"
+            v-model="shiftName"
+          />
         </div>
         <div class="shift_startTime-input-area">
           シフト開始時刻：<input
             class="shift_startTime-input-field"
             type="datetime-local"
+            v-model="shiftStartAt"
           />
+          {{ shiftStartAt }}
         </div>
         <div class="shift_endTime-input-area">
           シフト終了時刻：<input
             class="shift_endTime-input-field"
             type="datetime-local"
+            v-model="shiftEndAt"
           />
+          {{ shiftEndAt }}
         </div>
+        <button class="register-shift" @click="registerShift()">
+          シフトを登録
+        </button>
       </div>
     </div>
   </div>
@@ -79,137 +117,141 @@ export default {
         {
           id: 1,
           name: "ミーティング",
-          start: "2022-9-01",
-          end: "2022-9-01",
+          start: "2022-09-01T10:00",
+          end: "2022-09-01T12:00",
           color: "blue",
         },
         {
           id: 2,
           name: "イベント",
-          start: "2022-9-02",
-          end: "2022-9-03",
+          start: "2022-09-02T15:00",
+          end: "2022-09-03T11:00",
           color: "limegreen",
         },
         {
           id: 3,
           name: "会議",
-          start: "2022-9-06",
-          end: "2022-9-06",
+          start: "2022-09-06T14:00",
+          end: "2022-09-06T18:00",
           color: "deepskyblue",
         },
         {
           id: 4,
           name: "有給",
-          start: "2022-9-08",
-          end: "2022-9-08",
+          start: "2022-09-08",
+          end: "2022-09-08",
           color: "dimgray",
         },
         {
           id: 5,
           name: "海外旅行",
-          start: "2022-9-08",
-          end: "2022-9-11",
+          start: "2022-09-08",
+          end: "2022-09-11",
           color: "navy",
         },
         {
           id: 6,
           name: "誕生日",
-          start: "2022-9-16",
-          end: "2022-9-16",
+          start: "2022-09-16",
+          end: "2022-09-16",
           color: "orange",
         },
         {
           id: 7,
           name: "イベント",
-          start: "2022-9-12",
-          end: "2022-9-15",
+          start: "2022-09-12T18:00",
+          end: "2022-09-15T20:00",
           color: "limegreen",
         },
         {
           id: 8,
           name: "出張",
-          start: "2022-9-12",
-          end: "2022-9-13",
+          start: "2022-09-12T8:00",
+          end: "2022-09-13T17:00",
           color: "teal",
         },
         {
           id: 9,
           name: "客先訪問",
-          start: "2022-9-14",
-          end: "2022-9-14",
+          start: "2022-09-14T7:00",
+          end: "2022-09-14T12:00",
           color: "red",
         },
         {
           id: 10,
           name: "パーティ",
-          start: "2022-9-15",
-          end: "2022-9-15",
+          start: "2022-09-15T18:00",
+          end: "2022-09-15T21:00",
           color: "royalblue",
         },
         {
           id: 12,
           name: "ミーティング",
-          start: "2022-9-18",
-          end: "2022-9-19",
+          start: "2022-09-18T20:00",
+          end: "2022-09-19T21:00",
           color: "blue",
         },
         {
           id: 13,
           name: "イベント",
-          start: "2022-9-21",
-          end: "2022-9-21",
+          start: "2022-09-21T13:00",
+          end: "2022-09-21T15:00",
           color: "limegreen",
         },
         {
           id: 14,
           name: "有給",
-          start: "2022-9-20",
-          end: "2022-9-20",
+          start: "2022-09-20",
+          end: "2022-09-20",
           color: "dimgray",
         },
         {
           id: 15,
           name: "イベント",
-          start: "2022-9-25",
-          end: "2022-9-28",
+          start: "2022-09-25T18:00",
+          end: "2022-09-28T20:00",
           color: "limegreen",
         },
         {
           id: 16,
           name: "会議",
-          start: "2022-9-21",
-          end: "2022-9-21",
+          start: "2022-09-21T13:00",
+          end: "2022-09-21T14:00",
           color: "deepskyblue",
         },
         {
           id: 17,
           name: "旅行",
-          start: "2022-9-23",
-          end: "2022-9-24",
+          start: "2022-09-23",
+          end: "2022-09-24",
           color: "navy",
         },
         {
           id: 18,
           name: "ミーティング",
-          start: "2022-9-28",
-          end: "2022-9-28",
+          start: "2022-09-28T13:00",
+          end: "2022-09-28T14:00",
           color: "blue",
         },
         {
           id: 19,
           name: "会議",
-          start: "2022-9-12",
-          end: "2022-9-12",
+          start: "2022-09-12T15:00",
+          end: "2022-09-12T16:00",
           color: "deepskyblue",
         },
         {
           id: 20,
           name: "誕生日",
-          start: "2022-9-30",
-          end: "2022-9-30",
+          start: "2022-09-30",
+          end: "2022-09-30",
           color: "orange",
         },
       ],
+      shiftName: "",
+      shiftStartAt: "",
+      shiftEndAt: "",
+      weeklyCalendarButton: [false, false, false, false, false],
     }
   },
   methods: {
@@ -349,6 +391,23 @@ export default {
         .add(betweenDays, "days")
         .format("YYYY-MM-DD")
     },
+    weeklyCalendarButtonChange(index) {
+      if (this.weeklyCalendarButton[index]) {
+        this.weeklyCalendarButton[index] = false
+      } else {
+        this.weeklyCalendarButton[index] = true
+      }
+    },
+    registerShift() {
+      let eventLength = this.event.length
+      this.event.push({
+        id: eventLength + 1,
+        name: this.ShiftName,
+        start: this.shiftStartAt,
+        end: this.shiftEndAt,
+        color: "blue",
+      })
+    },
   },
   computed: {
     calendars() {
@@ -376,7 +435,8 @@ export default {
 <style>
 .content {
   margin: 2em auto;
-  width: 100%;
+  width: 90%;
+  left: 30px;
 }
 .button-area {
   margin: 0.5em 0;
@@ -426,5 +486,40 @@ export default {
 }
 .register-shift {
   border: solid 3px;
+}
+.weekly-calendar-frame {
+  border-bottom: solid 1px;
+}
+.weekly-calendar-time {
+  min-height: 20px;
+  border-top: solid 1px black;
+}
+.calendar-left-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  position: relative;
+  left: -30px;
+  margin-right: -30px;
+  font-size: 10px;
+  top: 7px;
+}
+.calendar-left-bar-content {
+  margin: auto;
+  text-align: right;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+#time-zero {
+  width: 30px;
+  position: relative;
+  left: -30px;
+  margin-right: -30px;
+  font-size: 10px;
+  top: -5px;
 }
 </style>

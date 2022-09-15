@@ -3,7 +3,7 @@
 
 <template>
   <div class="content">
-    <h1>メインカレンダー</h1>
+    <h1>{{ userName }}さんのメインカレンダー</h1>
     <h2>{{ displayMonth }}</h2>
     <div class="button-area">
       <button @click="prevMonth">前の月</button>
@@ -121,8 +121,17 @@ import moment from "moment"
 const db = getFirestore()
 const auth = getAuth()
 const user = auth.currentUser
-const userName = user.displayName
-const userData = doc(db, "users", userName)
+const getUserData = function () {
+  if (user !== null) {
+    const userName = user.displayName
+    const userData = doc(db, "users", userName)
+    return [userName, userData]
+  }
+  return ["ログインしていない", ""]
+}
+const getUserDataArray = getUserData()
+const userName = getUserDataArray[0]
+const userData = getUserDataArray[1]
 
 export default {
   data() {
@@ -267,10 +276,7 @@ export default {
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
-      // auth: null,
-      // user: null,
-      // userName: null,
-      // useData: null,
+      usreName: userName,
     }
   },
   methods: {

@@ -3,7 +3,7 @@
 
 <template>
   <div class="content">
-    <h1>{{ userName }}さんのメインカレンダー</h1>
+    <h1>{{ userName }}さんのシフトカレンダー</h1>
     <h2>{{ displayMonth }}</h2>
     <div class="button-area">
       <button @click="prevMonth">前の月</button>
@@ -111,9 +111,9 @@
 import {
   getFirestore,
   doc,
-  setDoc,
   arrayUnion,
   updateDoc,
+  getDoc,
 } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import moment from "moment"
@@ -132,6 +132,13 @@ const getUserData = function () {
 const getUserDataArray = getUserData()
 const userName = getUserDataArray[0]
 const userData = getUserDataArray[1]
+
+const userSnapGet = async function () {
+  const userSnap = await getDoc(userData)
+  return userSnap
+}
+const userSnap = userSnapGet()
+console.log(userSnap)
 
 export default {
   data() {
@@ -276,7 +283,7 @@ export default {
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
-      usreName: userName,
+      userName: userName,
     }
   },
   methods: {
@@ -467,15 +474,7 @@ export default {
       })
     },
   },
-  async created() {
-    await setDoc(
-      userData,
-      {
-        events: [],
-      },
-      { merge: true }
-    )
-  },
+  created() {},
 }
 </script>
 

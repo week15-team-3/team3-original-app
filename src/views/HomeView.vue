@@ -14,6 +14,11 @@
 
     <div v-else>
       <div class="container">
+        <!-- <nav>
+          <router-link to="./maincalendar">calendar</router-link>
+          <router-link to="/salary">salary</router-link>
+          <router-link to="/about">About</router-link>
+        </nav> -->
         <h2>{{ showUser.name }}<br />さん、こんにちは</h2>
         <div class="loginform">
           <button @click="SignOut" class="loginbutton">ログアウト</button>

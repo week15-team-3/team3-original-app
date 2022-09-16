@@ -4,6 +4,7 @@
     <router-link to="/maincalendar">Calendar</router-link> |
     <router-link to="/salary">Salary</router-link> |
     <router-link to="/about">About</router-link> |
+    <router-link to="/registerWork">RegisterWork</router-link>
   </nav>
   <router-view />
 </template>

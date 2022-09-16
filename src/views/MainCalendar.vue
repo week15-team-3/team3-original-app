@@ -42,7 +42,7 @@
             </div>
           </div>
         </div>
-        <button @click="weeklyCalendarButtonChange(index)">週カレンダー</button>
+        <button @click="weeklyCalendarButtonChange(index)">上の週の詳細</button>
         <div
           class="weekly-calendar-frame calendar-weekly"
           v-if="weeklyCalendarButton[index]"
@@ -89,7 +89,6 @@
             type="datetime-local"
             v-model="shiftStartAt"
           />
-          {{ shiftStartAt }}
         </div>
         <div class="shift_endTime-input-area">
           シフト終了時刻：<input
@@ -97,9 +96,8 @@
             type="datetime-local"
             v-model="shiftEndAt"
           />
-          {{ shiftEndAt }}
         </div>
-        <button class="register-shift" @click="registerShift()">
+        <button class="register-shift" @click="registerShift">
           シフトを登録
         </button>
       </div>
@@ -108,185 +106,62 @@
 </template>
 
 <script>
-import {
-  getFirestore,
-  doc,
-  arrayUnion,
-  updateDoc,
-  getDoc,
-} from "firebase/firestore"
-import { getAuth } from "firebase/auth"
+import { db, auth } from "../firebase"
+import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore"
 import moment from "moment"
-
-const db = getFirestore()
-const auth = getAuth()
-const user = auth.currentUser
-const getUserData = function () {
-  if (user !== null) {
-    const userName = user.displayName
-    const userData = doc(db, "users", userName)
-    return [userName, userData]
-  }
-  return ["ログインしていない", ""]
-}
-const getUserDataArray = getUserData()
-const userName = getUserDataArray[0]
-const userData = getUserDataArray[1]
-
-const userSnapGet = async function () {
-  const userSnap = await getDoc(userData)
-  return userSnap
-}
-const userSnap = userSnapGet()
-console.log(userSnap)
 
 export default {
   data() {
     return {
+      // firebase関連の変数
+      user: auth.currentUser,
+      userName: null,
+      userData: null,
+      userDataRef: null,
+      userSnap: null,
+      // カレンダー関連の変数
       currentDate: moment(),
-      events: [
-        {
-          id: 1,
-          name: "ミーティング",
-          start: "2022-09-01T10:00",
-          end: "2022-09-01T12:00",
-          color: "blue",
-        },
-        {
-          id: 2,
-          name: "イベント",
-          start: "2022-09-02T15:00",
-          end: "2022-09-03T11:00",
-          color: "limegreen",
-        },
-        {
-          id: 3,
-          name: "会議",
-          start: "2022-09-06T14:00",
-          end: "2022-09-06T18:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 4,
-          name: "有給",
-          start: "2022-09-08",
-          end: "2022-09-08",
-          color: "dimgray",
-        },
-        {
-          id: 5,
-          name: "海外旅行",
-          start: "2022-09-08",
-          end: "2022-09-11",
-          color: "navy",
-        },
-        {
-          id: 6,
-          name: "誕生日",
-          start: "2022-09-16",
-          end: "2022-09-16",
-          color: "orange",
-        },
-        {
-          id: 7,
-          name: "イベント",
-          start: "2022-09-12T18:00",
-          end: "2022-09-15T20:00",
-          color: "limegreen",
-        },
-        {
-          id: 8,
-          name: "出張",
-          start: "2022-09-12T8:00",
-          end: "2022-09-13T17:00",
-          color: "teal",
-        },
-        {
-          id: 9,
-          name: "客先訪問",
-          start: "2022-09-14T7:00",
-          end: "2022-09-14T12:00",
-          color: "red",
-        },
-        {
-          id: 10,
-          name: "パーティ",
-          start: "2022-09-15T18:00",
-          end: "2022-09-15T21:00",
-          color: "royalblue",
-        },
-        {
-          id: 12,
-          name: "ミーティング",
-          start: "2022-09-18T20:00",
-          end: "2022-09-19T21:00",
-          color: "blue",
-        },
-        {
-          id: 13,
-          name: "イベント",
-          start: "2022-09-21T13:00",
-          end: "2022-09-21T15:00",
-          color: "limegreen",
-        },
-        {
-          id: 14,
-          name: "有給",
-          start: "2022-09-20",
-          end: "2022-09-20",
-          color: "dimgray",
-        },
-        {
-          id: 15,
-          name: "イベント",
-          start: "2022-09-25T18:00",
-          end: "2022-09-28T20:00",
-          color: "limegreen",
-        },
-        {
-          id: 16,
-          name: "会議",
-          start: "2022-09-21T13:00",
-          end: "2022-09-21T14:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 17,
-          name: "旅行",
-          start: "2022-09-23",
-          end: "2022-09-24",
-          color: "navy",
-        },
-        {
-          id: 18,
-          name: "ミーティング",
-          start: "2022-09-28T13:00",
-          end: "2022-09-28T14:00",
-          color: "blue",
-        },
-        {
-          id: 19,
-          name: "会議",
-          start: "2022-09-12T15:00",
-          end: "2022-09-12T16:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 20,
-          name: "誕生日",
-          start: "2022-09-30",
-          end: "2022-09-30",
-          color: "orange",
-        },
-      ],
+      events: [],
       shiftName: "",
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
-      userName: userName,
     }
   },
   methods: {
+    checkUserLogin() {
+      if (this.user !== null) {
+        this.userName = this.user.displayName
+        this.userDataRef = doc(db, "users", this.userName)
+      } else {
+        this.userName = "未ログイン"
+        this.userDataRef = ""
+        console.log("ログインしてください。")
+      }
+    },
+    userSnapGet: async function () {
+      this.userSnap = await getDoc(this.userDataRef)
+      this.userData = await this.userSnap.data()
+    },
+    setEventsField() {
+      if (!("events" in this.userData)) {
+        setDoc(
+          this.userDataRef,
+          {
+            events: [],
+          },
+          { merge: true }
+        )
+        console.log("firestoreにeventsフィールルドを作成しました。")
+      } else {
+        console.log(
+          "すでにこのユーザはFirestore内にeventsフィールドを持っています。"
+        )
+      }
+    },
+    displayFirestoreData() {
+      this.events = this.userData.events
+    },
     getStartDate() {
       let date = moment(this.currentDate).startOf("month")
       const youbiNum = date.day()
@@ -430,18 +305,6 @@ export default {
         this.weeklyCalendarButton[index] = true
       }
     },
-    async addShiftToFirebase() {
-      await updateDoc(userData, {
-        events: arrayUnion({
-          id: "",
-          name: this.shiftName,
-          start: this.shiftStartAt,
-          end: this.shiftEndAt,
-          color: "blue",
-        }),
-      }),
-        console.log()
-    },
     registerShift() {
       let eventsLength = this.events.length
       this.events.push({
@@ -453,7 +316,13 @@ export default {
       })
       this.addShiftToFirebase()
     },
+    async addShiftToFirebase() {
+      await updateDoc(this.userDataRef, {
+        events: this.events,
+      })
+    },
   },
+
   computed: {
     calendars() {
       return this.getCalendar()
@@ -474,7 +343,12 @@ export default {
       })
     },
   },
-  created() {},
+  async created() {
+    this.checkUserLogin()
+    await this.userSnapGet()
+    await this.setEventsField()
+    this.displayFirestoreData()
+  },
 }
 </script>
 

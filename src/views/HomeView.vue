@@ -36,7 +36,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
 
 * {
@@ -310,11 +310,15 @@ export default {
       this.logInOut = !this.logInOut
     },
 
-    setUser(user) {
-      setDoc(doc(db, "users", user.displayName), {
-        userName: user.displayName,
-        ID: user.uid,
-      })
+    async setUser(user) {
+      const userSnap = await getDoc(doc(db, "users", user.displayName))
+      console.log(userSnap.exists())
+      if (!userSnap.exists()) {
+        setDoc(doc(db, "users", user.displayName), {
+          userName: user.displayName,
+          ID: user.uid,
+        })
+      }
     },
 
     getUserData: async function (user) {

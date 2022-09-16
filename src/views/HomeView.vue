@@ -36,7 +36,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
 
 * {

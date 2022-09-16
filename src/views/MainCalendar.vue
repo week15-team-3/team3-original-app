@@ -42,12 +42,17 @@
             </div>
           </div>
         </div>
-        <button @click="weeklyCalendarButtonChange(index)">週カレンダー</button>
+        <button
+          @click="weeklyCalendarButtonChange(index)"
+          class="display-detailCalendar"
+        >
+          週カレンダー
+        </button>
         <div
           class="weekly-calendar-frame calendar-weekly"
           v-if="weeklyCalendarButton[index]"
         >
-          <div id="time-zero">00:00</div>
+          <!-- <div id="time-zero">00:00</div>
           <div class="calendar-left-bar">
             <div class="calendar-left-bar-content">02:00</div>
             <div class="calendar-left-bar-content">04:00</div>
@@ -61,14 +66,27 @@
             <div class="calendar-left-bar-content">20:00</div>
             <div class="calendar-left-bar-content">22:00</div>
             <div class="calendar-left-bar-content">24:00</div>
-          </div>
+          </div> -->
 
           <div
             class="weekly-calendar-day calendar-daily"
-            v-for="n in 7"
-            :key="n"
+            v-for="(day, index) in week"
+            :key="index"
           >
-            <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div>
+            <div
+              v-for="dayEvent in day.dayEvents"
+              :key="dayEvent.id"
+              class="calendar-event-detail"
+              :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
+            >
+              <h4 class="calendar-event-detail_title">{{ dayEvent.name }}</h4>
+              <br />
+              開始時刻:<br />
+              {{ this.convertTime(dayEvent.start) }}<br />
+              終了時刻:<br />
+              {{ this.convertTime(dayEvent.end) }}
+            </div>
+            <!-- <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div> -->
           </div>
         </div>
       </div>
@@ -113,141 +131,7 @@ export default {
   data() {
     return {
       currentDate: moment(),
-      events: [
-        {
-          id: 1,
-          name: "ミーティング",
-          start: "2022-09-01T10:00",
-          end: "2022-09-01T12:00",
-          color: "blue",
-        },
-        {
-          id: 2,
-          name: "イベント",
-          start: "2022-09-02T15:00",
-          end: "2022-09-03T11:00",
-          color: "limegreen",
-        },
-        {
-          id: 3,
-          name: "会議",
-          start: "2022-09-06T14:00",
-          end: "2022-09-06T18:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 4,
-          name: "有給",
-          start: "2022-09-08",
-          end: "2022-09-08",
-          color: "dimgray",
-        },
-        {
-          id: 5,
-          name: "海外旅行",
-          start: "2022-09-08",
-          end: "2022-09-11",
-          color: "navy",
-        },
-        {
-          id: 6,
-          name: "誕生日",
-          start: "2022-09-16",
-          end: "2022-09-16",
-          color: "orange",
-        },
-        {
-          id: 7,
-          name: "イベント",
-          start: "2022-09-12T18:00",
-          end: "2022-09-15T20:00",
-          color: "limegreen",
-        },
-        {
-          id: 8,
-          name: "出張",
-          start: "2022-09-12T8:00",
-          end: "2022-09-13T17:00",
-          color: "teal",
-        },
-        {
-          id: 9,
-          name: "客先訪問",
-          start: "2022-09-14T7:00",
-          end: "2022-09-14T12:00",
-          color: "red",
-        },
-        {
-          id: 10,
-          name: "パーティ",
-          start: "2022-09-15T18:00",
-          end: "2022-09-15T21:00",
-          color: "royalblue",
-        },
-        {
-          id: 12,
-          name: "ミーティング",
-          start: "2022-09-18T20:00",
-          end: "2022-09-19T21:00",
-          color: "blue",
-        },
-        {
-          id: 13,
-          name: "イベント",
-          start: "2022-09-21T13:00",
-          end: "2022-09-21T15:00",
-          color: "limegreen",
-        },
-        {
-          id: 14,
-          name: "有給",
-          start: "2022-09-20",
-          end: "2022-09-20",
-          color: "dimgray",
-        },
-        {
-          id: 15,
-          name: "イベント",
-          start: "2022-09-25T18:00",
-          end: "2022-09-28T20:00",
-          color: "limegreen",
-        },
-        {
-          id: 16,
-          name: "会議",
-          start: "2022-09-21T13:00",
-          end: "2022-09-21T14:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 17,
-          name: "旅行",
-          start: "2022-09-23",
-          end: "2022-09-24",
-          color: "navy",
-        },
-        {
-          id: 18,
-          name: "ミーティング",
-          start: "2022-09-28T13:00",
-          end: "2022-09-28T14:00",
-          color: "blue",
-        },
-        {
-          id: 19,
-          name: "会議",
-          start: "2022-09-12T15:00",
-          end: "2022-09-12T16:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 20,
-          name: "誕生日",
-          start: "2022-09-30",
-          end: "2022-09-30",
-          color: "orange",
-        },
-      ],
+      events: [],
       shiftName: "",
       shiftStartAt: "",
       shiftEndAt: "",
@@ -408,6 +292,10 @@ export default {
         color: "blue",
       })
     },
+    convertTime(data) {
+      const time = moment(data).format("HH:mm")
+      return time
+    },
   },
   computed: {
     calendars() {
@@ -521,5 +409,21 @@ export default {
   margin-right: -30px;
   font-size: 10px;
   top: -5px;
+}
+.display-detailCalendar {
+  position: relative;
+  z-index: 1;
+}
+.calendar-event-detail_title {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.calendar-event-detail {
+  color: white;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
 }
 </style>

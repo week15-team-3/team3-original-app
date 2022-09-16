@@ -4,7 +4,6 @@
     <router-link to="/maincalendar">Calendar</router-link> |
     <router-link to="/salary">Salary</router-link> |
     <router-link to="/about">About</router-link> |
-    <router-link to="/registerwork">バイト先の登録</router-link>
   </nav>
   <router-view />
 </template>

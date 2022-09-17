@@ -40,9 +40,17 @@
   </div>
 </template>
 
-
-
 <script>
+import { db } from "../firebase"
+import {
+  getAuth,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth"
+import { setDoc, doc, getDoc } from "firebase/firestore"
+
 export default {
   name: "PageIndex",
   // props: ["logInOut"],
@@ -332,4 +340,3 @@ export default {
   }
 }
 </style>
-

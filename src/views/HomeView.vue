@@ -1,5 +1,5 @@
 <template>
-   <div class="wrapper">
+  <div class="wrapper">
     <div v-if="logInOut === false">
       <div class="container">
         <h2>Welcome</h2>
@@ -19,10 +19,7 @@
           <button @click="SignOut" class="loginbutton">ログアウト</button>
         </div>
         <nav>
-          <router-link to="/">Home</router-link>
           <router-link to="/maincalendar">calendar</router-link>
-          <!-- <router-link to="/salary">salary</router-link> -->
-          <!-- <router-link to="/about">About</router-link> -->
         </nav>
         <router-view />
       </div>
@@ -43,8 +40,6 @@
   </div>
 </template>
 
-
-<style scoped>
 <script>
 import {
   getAuth,
@@ -138,7 +133,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
 
 * {

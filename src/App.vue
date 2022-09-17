@@ -3,7 +3,6 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/maincalendar">calendar</router-link>
     <router-link to="/salary">salary</router-link>
-    <router-link to="/about">About</router-link>
   </nav>
   <router-view />
 </template>

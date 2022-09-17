@@ -126,6 +126,8 @@ export default {
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
+      // バイト先を代入する変数
+      Jobs: [],
     }
   },
   methods: {

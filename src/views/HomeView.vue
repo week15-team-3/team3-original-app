@@ -15,100 +15,8 @@
   </div>
 </template>
 
-<script>
-import {
-  getAuth,
-  signOut,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged,
-} from "firebase/auth"
-import { db } from "../firebase"
-import { setDoc, doc, getDoc } from "firebase/firestore"
 
-export default {
-  name: "PageIndex",
-  // props: ["logInOut"],
-  mounted() {
-    const auth = getAuth()
-    // const user = auth.currentUser
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.logInOut = true
-        const currentUserData = this.getUserData(user)
-        console.log(currentUserData)
-      } else {
-        // this.logInOut = false
-      }
-    })
-  },
-  data() {
-    return {
-      logInOut: false,
-      userData: [],
-      showUser: [],
-    }
-  },
-
-  methods: {
-    SignIn: async function () {
-      // クリックしたらgoogleアカウントでサインイン。userのデータをsetUserでfirebaseに登録。
-      const provider = new GoogleAuthProvider()
-
-      const auth = getAuth()
-      await signInWithPopup(auth, provider)
-        .then((result) => {
-          const user = result.user
-
-          this.setUser(user)
-          // this.getUserData(user)
-          console.log(user)
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-      // this.logInOut = !this.logInOut
-    },
-
-    SignOut: async function () {
-      const auth = getAuth()
-      await signOut(auth)
-        .then(() => {
-          alert("signout")
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-      this.logInOut = !this.logInOut
-    },
-
-    setUser(user) {
-      setDoc(doc(db, "users", user.displayName), {
-        userName: user.displayName,
-        ID: user.uid,
-      })
-    },
-
-    getUserData: async function (user) {
-      const docRef = doc(db, "users", user.displayName)
-      const docSnap = await getDoc(docRef)
-      this.userData.push({
-        name: docSnap.data().userName,
-        id: docSnap.data().ID,
-      })
-
-      // ロード時はuserDataが空なのでエラーになる。
-      this.showUser.name = this.userData[0].name
-      console.log(this.showUser)
-    },
-    sendLogInOut() {
-      this.$emit("catchLogInOut", this.logInOut)
-    },
-  },
-}
-</script>
-
-<style>
+<style scoped>
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
 
 * {
@@ -315,3 +223,4 @@ export default {
   }
 }
 </style>
+

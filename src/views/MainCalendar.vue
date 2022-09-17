@@ -3,7 +3,7 @@
 
 <template>
   <div class="content">
-    <h1>メインカレンダー</h1>
+    <h1>{{ userName }}さんのシフトカレンダー</h1>
     <h2>{{ displayMonth }}</h2>
     <div class="button-area">
       <button @click="prevMonth">前の月</button>
@@ -42,12 +42,10 @@
             </div>
           </div>
         </div>
-        <button
-          @click="weeklyCalendarButtonChange(index)"
-          class="display-detailCalendar"
-        >
-          週カレンダー
-        </button>
+
+
+        <button @click="weeklyCalendarButtonChange(index)">上の週の詳細</button>
+
         <div
           class="weekly-calendar-frame calendar-weekly"
           v-if="weeklyCalendarButton[index]"
@@ -107,7 +105,6 @@
             type="datetime-local"
             v-model="shiftStartAt"
           />
-          {{ shiftStartAt }}
         </div>
         <div class="shift_endTime-input-area">
           シフト終了時刻：<input
@@ -115,9 +112,8 @@
             type="datetime-local"
             v-model="shiftEndAt"
           />
-          {{ shiftEndAt }}
         </div>
-        <button class="register-shift" @click="registerShift()">
+        <button class="register-shift" @click="registerShift">
           シフトを登録
         </button>
       </div>
@@ -126,10 +122,20 @@
 </template>
 
 <script>
+import { db, auth } from "../firebase"
+import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore"
 import moment from "moment"
+
 export default {
   data() {
     return {
+      // firebase関連の変数
+      user: auth.currentUser,
+      userName: null,
+      userData: null,
+      userDataRef: null,
+      userSnap: null,
+      // カレンダー関連の変数
       currentDate: moment(),
       events: [],
       shiftName: "",
@@ -139,6 +145,39 @@ export default {
     }
   },
   methods: {
+    checkUserLogin() {
+      if (this.user !== null) {
+        this.userName = this.user.displayName
+        this.userDataRef = doc(db, "users", this.userName)
+      } else {
+        this.userName = "未ログイン"
+        this.userDataRef = ""
+        console.log("ログインしてください。")
+      }
+    },
+    userSnapGet: async function () {
+      this.userSnap = await getDoc(this.userDataRef)
+      this.userData = await this.userSnap.data()
+    },
+    setEventsField() {
+      if (!("events" in this.userData)) {
+        setDoc(
+          this.userDataRef,
+          {
+            events: [],
+          },
+          { merge: true }
+        )
+        console.log("firestoreにeventsフィールルドを作成しました。")
+      } else {
+        console.log(
+          "すでにこのユーザはFirestore内にeventsフィールドを持っています。"
+        )
+      }
+    },
+    displayFirestoreData() {
+      this.events = this.userData.events
+    },
     getStartDate() {
       let date = moment(this.currentDate).startOf("month")
       const youbiNum = date.day()
@@ -291,12 +330,19 @@ export default {
         end: this.shiftEndAt,
         color: "blue",
       })
+      this.addShiftToFirebase()
+    },
+    async addShiftToFirebase() {
+      await updateDoc(this.userDataRef, {
+        events: this.events,
+      })
     },
     convertTime(data) {
       const time = moment(data).format("HH:mm")
       return time
     },
   },
+
   computed: {
     calendars() {
       return this.getCalendar()
@@ -316,6 +362,12 @@ export default {
         return 0
       })
     },
+  },
+  async created() {
+    this.checkUserLogin()
+    await this.userSnapGet()
+    await this.setEventsField()
+    this.displayFirestoreData()
   },
 }
 </script>

@@ -42,12 +42,14 @@
             </div>
           </div>
         </div>
+
         <button @click="weeklyCalendarButtonChange(index)">上の週の詳細</button>
+
         <div
           class="weekly-calendar-frame calendar-weekly"
           v-if="weeklyCalendarButton[index]"
         >
-          <div id="time-zero">00:00</div>
+          <!-- <div id="time-zero">00:00</div>
           <div class="calendar-left-bar">
             <div class="calendar-left-bar-content">02:00</div>
             <div class="calendar-left-bar-content">04:00</div>
@@ -61,14 +63,27 @@
             <div class="calendar-left-bar-content">20:00</div>
             <div class="calendar-left-bar-content">22:00</div>
             <div class="calendar-left-bar-content">24:00</div>
-          </div>
+          </div> -->
 
           <div
             class="weekly-calendar-day calendar-daily"
-            v-for="n in 7"
-            :key="n"
+            v-for="(day, index) in week"
+            :key="index"
           >
-            <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div>
+            <div
+              v-for="dayEvent in day.dayEvents"
+              :key="dayEvent.id"
+              class="calendar-event-detail"
+              :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
+            >
+              <h4 class="calendar-event-detail_title">{{ dayEvent.name }}</h4>
+              <br />
+              開始時刻:<br />
+              {{ this.convertTime(dayEvent.start) }}<br />
+              終了時刻:<br />
+              {{ this.convertTime(dayEvent.end) }}
+            </div>
+            <!-- <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div> -->
           </div>
         </div>
       </div>
@@ -323,6 +338,10 @@ export default {
         events: this.events,
       })
     },
+    convertTime(data) {
+      const time = moment(data).format("HH:mm")
+      return time
+    },
   },
 
   computed: {
@@ -443,5 +462,21 @@ export default {
   margin-right: -30px;
   font-size: 10px;
   top: -5px;
+}
+.display-detailCalendar {
+  position: relative;
+  z-index: 1;
+}
+.calendar-event-detail_title {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.calendar-event-detail {
+  color: white;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
 }
 </style>

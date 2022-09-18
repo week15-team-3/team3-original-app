@@ -22,12 +22,6 @@ const routes = [
     component: SalaryView,
   },
   {
-    path: "/about",
-    name: "about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  },
-  {
     path: "/registerwork",
     name: "registerWork",
     component: RegisterWorkView,

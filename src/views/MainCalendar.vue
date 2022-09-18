@@ -43,7 +43,6 @@
           </div>
         </div>
 
-
         <button @click="weeklyCalendarButtonChange(index)">上の週の詳細</button>
 
         <div

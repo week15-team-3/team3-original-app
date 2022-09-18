@@ -1,9 +1,14 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/maincalendar">calendar</router-link>
-    <router-link to="/salary">salary</router-link>
-  </nav>
+  <div class="main-container">
+    <div>
+      <h2>バイトシフター</h2>
+    </div>
+    <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/maincalendar">calendar</router-link>
+      <router-link to="/salary">salary</router-link>
+    </nav>
+  </div>
   <router-view />
 </template>
 
@@ -12,7 +17,6 @@
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 

@@ -373,11 +373,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .content {
   margin: 2em auto;
   width: 90%;
   left: 30px;
+  text-align: center;
 }
 .button-area {
   margin: 0.5em 0;
@@ -390,6 +391,7 @@ export default {
   max-width: 900px;
   border-top: 1px solid #e0e0e0;
   font-size: 0.8em;
+  margin: auto;
 }
 .calendar-youbi {
   flex: 1;

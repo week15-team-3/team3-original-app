@@ -1,20 +1,24 @@
 <template>
-  <h1>バイト先の登録</h1>
-  <div class="job-input-area">
-    <div id="job_name-input-area">
-      名前：
-      <input class="job-input-field" v-model="inputJobName" />
+  <div class="content">
+    <h1>バイト先の登録</h1>
+    <div class="job-input-area">
+      <div id="job_name-input-area">
+        名前：
+        <input class="job-input-field" v-model="inputJobName" />
+      </div>
+      <div id="job_wage-input-area">
+        時給:
+        <input class="job-input-field" v-model="inputJobWage" />円
+      </div>
     </div>
-    <div id="job_wage-input-area">
-      時給:
-      <input class="job-input-field" v-model="inputJobWage" />円
+    <button class="register-button" @click="registerWork">バイト先を登録</button
+    ><br />
+    <router-link to="/mainCalendar">カレンダーへ戻る</router-link>
+    <h3>{{ userName }}さんのバイト先一覧</h3>
+    <div class="job-container" v-for="(Job, index) in Jobs" :key="index">
+      <div class="job-display-name">{{ Job.name }}</div>
+      <div class="job-display-wage">時給：{{ Job.wage }}円</div>
     </div>
-  </div>
-  <button class="register-button" @click="registerWork">バイト先を登録</button>
-  <h3>{{ userName }}さんのバイト先一覧</h3>
-  <div class="job-container" v-for="(Job, index) in Jobs" :key="index">
-    <div class="job-display-name">{{ Job.name }}</div>
-    <div class="job-display-wage">時給：{{ Job.wage }}円</div>
   </div>
 </template>
 
@@ -94,7 +98,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.content {
+  text-align: center;
+}
 .job-container {
   border: 3px solid;
 }

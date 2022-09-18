@@ -92,29 +92,41 @@
       <h2>シフトの登録</h2>
       <div class="shift-input-area">
         <div class="shift_name-input-area">
-          シフトの名前(メモ)：<input
+          <!-- シフトの名前(メモ)：<input
             class="shift_name-input-field"
             type="text"
             v-model="shiftName"
-          />
+          /> -->
+          バイト先：
+          <div v-if="haveJobsData()">
+            バイト先が登録されていません<br />
+            <router-link to="/registerWork">バイト先を登録</router-link>
+          </div>
+          <select v-else class="shift_name-input-field" v-model="shiftName">
+            <option v-for="job in Jobs" :key="job.id">{{ job.name }}</option>
+          </select>
         </div>
-        <div class="shift_startTime-input-area">
-          シフト開始時刻：<input
-            class="shift_startTime-input-field"
-            type="datetime-local"
-            v-model="shiftStartAt"
-          />
+        <div v-if="haveJobsData()"></div>
+        <div v-else>
+          <div class="shift_startTime-input-area">
+            シフト開始時刻：<input
+              class="shift_startTime-input-field"
+              type="datetime-local"
+              v-model="shiftStartAt"
+            />
+          </div>
+          <div class="shift_endTime-input-area">
+            シフト終了時刻：<input
+              class="shift_endTime-input-field"
+              type="datetime-local"
+              v-model="shiftEndAt"
+            />
+          </div>
+          <button class="register-shift" @click="registerShift">
+            シフトを登録</button
+          ><br />
+          <router-link to="/registerWork">バイト先の登録・閲覧</router-link>
         </div>
-        <div class="shift_endTime-input-area">
-          シフト終了時刻：<input
-            class="shift_endTime-input-field"
-            type="datetime-local"
-            v-model="shiftEndAt"
-          />
-        </div>
-        <button class="register-shift" @click="registerShift">
-          シフトを登録
-        </button>
       </div>
     </div>
   </div>
@@ -178,6 +190,14 @@ export default {
     },
     displayFirestoreData() {
       this.events = this.userData.events
+      this.Jobs = this.userData.jobs
+    },
+    haveJobsData() {
+      if (this.Jobs.length === 0) {
+        return true
+      } else {
+        return false
+      }
     },
     getStartDate() {
       let date = moment(this.currentDate).startOf("month")

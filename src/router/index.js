@@ -20,12 +20,6 @@ const routes = [
     name: "salary",
     component: SalaryView,
   },
-  {
-    path: "/about",
-    name: "about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  },
 ]
 
 const router = createRouter({

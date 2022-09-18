@@ -149,6 +149,7 @@ export default {
       // カレンダー関連の変数
       currentDate: moment(),
       events: [],
+      // シフト登録関連の変数
       shiftName: "",
       shiftStartAt: "",
       shiftEndAt: "",
@@ -158,6 +159,7 @@ export default {
     }
   },
   methods: {
+    // firestore関連の関数
     checkUserLogin() {
       if (this.user !== null) {
         this.userName = this.user.displayName
@@ -199,6 +201,7 @@ export default {
         return false
       }
     },
+    // カレンダー機能関連の関数
     getStartDate() {
       let date = moment(this.currentDate).startOf("month")
       const youbiNum = date.day()
@@ -342,6 +345,7 @@ export default {
         this.weeklyCalendarButton[index] = true
       }
     },
+    // シフト登録機能関連の関数
     registerShift() {
       let eventsLength = this.events.length
       this.events.push({

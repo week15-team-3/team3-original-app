@@ -92,29 +92,41 @@
       <h2>シフトの登録</h2>
       <div class="shift-input-area">
         <div class="shift_name-input-area">
-          シフトの名前(メモ)：<input
+          <!-- シフトの名前(メモ)：<input
             class="shift_name-input-field"
             type="text"
             v-model="shiftName"
-          />
+          /> -->
+          バイト先：
+          <div v-if="haveJobsData()">
+            バイト先が登録されていません<br />
+            <router-link to="/registerWork">バイト先を登録</router-link>
+          </div>
+          <select v-else class="shift_name-input-field" v-model="shiftName">
+            <option v-for="job in Jobs" :key="job.id">{{ job.name }}</option>
+          </select>
         </div>
-        <div class="shift_startTime-input-area">
-          シフト開始時刻：<input
-            class="shift_startTime-input-field"
-            type="datetime-local"
-            v-model="shiftStartAt"
-          />
+        <div v-if="haveJobsData()"></div>
+        <div v-else>
+          <div class="shift_startTime-input-area">
+            シフト開始時刻：<input
+              class="shift_startTime-input-field"
+              type="datetime-local"
+              v-model="shiftStartAt"
+            />
+          </div>
+          <div class="shift_endTime-input-area">
+            シフト終了時刻：<input
+              class="shift_endTime-input-field"
+              type="datetime-local"
+              v-model="shiftEndAt"
+            />
+          </div>
+          <button class="register-shift" @click="registerShift">
+            シフトを登録</button
+          ><br />
+          <router-link to="/registerWork">バイト先の登録・閲覧</router-link>
         </div>
-        <div class="shift_endTime-input-area">
-          シフト終了時刻：<input
-            class="shift_endTime-input-field"
-            type="datetime-local"
-            v-model="shiftEndAt"
-          />
-        </div>
-        <button class="register-shift" @click="registerShift">
-          シフトを登録
-        </button>
       </div>
     </div>
   </div>
@@ -137,13 +149,17 @@ export default {
       // カレンダー関連の変数
       currentDate: moment(),
       events: [],
+      // シフト登録関連の変数
       shiftName: "",
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
+      // バイト先を代入する変数
+      Jobs: [],
     }
   },
   methods: {
+    // firestore関連の関数
     checkUserLogin() {
       if (this.user !== null) {
         this.userName = this.user.displayName
@@ -176,7 +192,16 @@ export default {
     },
     displayFirestoreData() {
       this.events = this.userData.events
+      this.Jobs = this.userData.jobs
     },
+    haveJobsData() {
+      if (this.Jobs.length === 0) {
+        return true
+      } else {
+        return false
+      }
+    },
+    // カレンダー機能関連の関数
     getStartDate() {
       let date = moment(this.currentDate).startOf("month")
       const youbiNum = date.day()
@@ -320,6 +345,7 @@ export default {
         this.weeklyCalendarButton[index] = true
       }
     },
+    // シフト登録機能関連の関数
     registerShift() {
       let eventsLength = this.events.length
       this.events.push({
@@ -371,11 +397,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .content {
   margin: 2em auto;
   width: 90%;
   left: 30px;
+  text-align: center;
 }
 .button-area {
   margin: 0.5em 0;
@@ -388,6 +415,7 @@ export default {
   max-width: 900px;
   border-top: 1px solid #e0e0e0;
   font-size: 0.8em;
+  margin: auto;
 }
 .calendar-youbi {
   flex: 1;

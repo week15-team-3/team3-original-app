@@ -3,7 +3,7 @@
 
 <template>
   <div class="content">
-    <h1>メインカレンダー</h1>
+    <h1>{{ userName }}さんのシフトカレンダー</h1>
     <h2>{{ displayMonth }}</h2>
     <div class="button-area">
       <button @click="prevMonth">前の月</button>
@@ -42,12 +42,14 @@
             </div>
           </div>
         </div>
-        <button @click="weeklyCalendarButtonChange(index)">週カレンダー</button>
+
+        <button @click="weeklyCalendarButtonChange(index)">上の週の詳細</button>
+
         <div
           class="weekly-calendar-frame calendar-weekly"
           v-if="weeklyCalendarButton[index]"
         >
-          <div id="time-zero">00:00</div>
+          <!-- <div id="time-zero">00:00</div>
           <div class="calendar-left-bar">
             <div class="calendar-left-bar-content">02:00</div>
             <div class="calendar-left-bar-content">04:00</div>
@@ -61,14 +63,27 @@
             <div class="calendar-left-bar-content">20:00</div>
             <div class="calendar-left-bar-content">22:00</div>
             <div class="calendar-left-bar-content">24:00</div>
-          </div>
+          </div> -->
 
           <div
             class="weekly-calendar-day calendar-daily"
-            v-for="n in 7"
-            :key="n"
+            v-for="(day, index) in week"
+            :key="index"
           >
-            <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div>
+            <div
+              v-for="dayEvent in day.dayEvents"
+              :key="dayEvent.id"
+              class="calendar-event-detail"
+              :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
+            >
+              <h4 class="calendar-event-detail_title">{{ dayEvent.name }}</h4>
+              <br />
+              開始時刻:<br />
+              {{ this.convertTime(dayEvent.start) }}<br />
+              終了時刻:<br />
+              {{ this.convertTime(dayEvent.end) }}
+            </div>
+            <!-- <div class="weekly-calendar-time" v-for="m in 24" :key="m"></div> -->
           </div>
         </div>
       </div>
@@ -77,184 +92,116 @@
       <h2>シフトの登録</h2>
       <div class="shift-input-area">
         <div class="shift_name-input-area">
-          シフトの名前(メモ)：<input
+          <!-- シフトの名前(メモ)：<input
             class="shift_name-input-field"
             type="text"
             v-model="shiftName"
-          />
+          /> -->
+          バイト先：
+          <div v-if="haveJobsData()">
+            バイト先が登録されていません<br />
+            <router-link to="/registerWork">バイト先を登録</router-link>
+          </div>
+          <select v-else class="shift_name-input-field" v-model="shiftName">
+            <option v-for="job in Jobs" :key="job.id">{{ job.name }}</option>
+          </select>
         </div>
-        <div class="shift_startTime-input-area">
-          シフト開始時刻：<input
-            class="shift_startTime-input-field"
-            type="datetime-local"
-            v-model="shiftStartAt"
-          />
-          {{ shiftStartAt }}
+        <div v-if="haveJobsData()"></div>
+        <div v-else>
+          <div class="shift_startTime-input-area">
+            シフト開始時刻：<input
+              class="shift_startTime-input-field"
+              type="datetime-local"
+              v-model="shiftStartAt"
+            />
+          </div>
+          <div class="shift_endTime-input-area">
+            シフト終了時刻：<input
+              class="shift_endTime-input-field"
+              type="datetime-local"
+              v-model="shiftEndAt"
+            />
+          </div>
+          <button class="register-shift" @click="registerShift">
+            シフトを登録</button
+          ><br />
+          <router-link to="/registerWork">バイト先の登録・閲覧</router-link>
         </div>
-        <div class="shift_endTime-input-area">
-          シフト終了時刻：<input
-            class="shift_endTime-input-field"
-            type="datetime-local"
-            v-model="shiftEndAt"
-          />
-          {{ shiftEndAt }}
-        </div>
-        <button class="register-shift" @click="registerShift()">
-          シフトを登録
-        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { db, auth } from "../firebase"
+import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore"
 import moment from "moment"
+
 export default {
   data() {
     return {
+      // firebase関連の変数
+      user: auth.currentUser,
+      userName: null,
+      userData: null,
+      userDataRef: null,
+      userSnap: null,
+      // カレンダー関連の変数
       currentDate: moment(),
-      events: [
-        {
-          id: 1,
-          name: "ミーティング",
-          start: "2022-09-01T10:00",
-          end: "2022-09-01T12:00",
-          color: "blue",
-        },
-        {
-          id: 2,
-          name: "イベント",
-          start: "2022-09-02T15:00",
-          end: "2022-09-03T11:00",
-          color: "limegreen",
-        },
-        {
-          id: 3,
-          name: "会議",
-          start: "2022-09-06T14:00",
-          end: "2022-09-06T18:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 4,
-          name: "有給",
-          start: "2022-09-08",
-          end: "2022-09-08",
-          color: "dimgray",
-        },
-        {
-          id: 5,
-          name: "海外旅行",
-          start: "2022-09-08",
-          end: "2022-09-11",
-          color: "navy",
-        },
-        {
-          id: 6,
-          name: "誕生日",
-          start: "2022-09-16",
-          end: "2022-09-16",
-          color: "orange",
-        },
-        {
-          id: 7,
-          name: "イベント",
-          start: "2022-09-12T18:00",
-          end: "2022-09-15T20:00",
-          color: "limegreen",
-        },
-        {
-          id: 8,
-          name: "出張",
-          start: "2022-09-12T8:00",
-          end: "2022-09-13T17:00",
-          color: "teal",
-        },
-        {
-          id: 9,
-          name: "客先訪問",
-          start: "2022-09-14T7:00",
-          end: "2022-09-14T12:00",
-          color: "red",
-        },
-        {
-          id: 10,
-          name: "パーティ",
-          start: "2022-09-15T18:00",
-          end: "2022-09-15T21:00",
-          color: "royalblue",
-        },
-        {
-          id: 12,
-          name: "ミーティング",
-          start: "2022-09-18T20:00",
-          end: "2022-09-19T21:00",
-          color: "blue",
-        },
-        {
-          id: 13,
-          name: "イベント",
-          start: "2022-09-21T13:00",
-          end: "2022-09-21T15:00",
-          color: "limegreen",
-        },
-        {
-          id: 14,
-          name: "有給",
-          start: "2022-09-20",
-          end: "2022-09-20",
-          color: "dimgray",
-        },
-        {
-          id: 15,
-          name: "イベント",
-          start: "2022-09-25T18:00",
-          end: "2022-09-28T20:00",
-          color: "limegreen",
-        },
-        {
-          id: 16,
-          name: "会議",
-          start: "2022-09-21T13:00",
-          end: "2022-09-21T14:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 17,
-          name: "旅行",
-          start: "2022-09-23",
-          end: "2022-09-24",
-          color: "navy",
-        },
-        {
-          id: 18,
-          name: "ミーティング",
-          start: "2022-09-28T13:00",
-          end: "2022-09-28T14:00",
-          color: "blue",
-        },
-        {
-          id: 19,
-          name: "会議",
-          start: "2022-09-12T15:00",
-          end: "2022-09-12T16:00",
-          color: "deepskyblue",
-        },
-        {
-          id: 20,
-          name: "誕生日",
-          start: "2022-09-30",
-          end: "2022-09-30",
-          color: "orange",
-        },
-      ],
+      events: [],
+      // シフト登録関連の変数
       shiftName: "",
       shiftStartAt: "",
       shiftEndAt: "",
       weeklyCalendarButton: [false, false, false, false, false],
+      // バイト先を代入する変数
+      Jobs: [],
     }
   },
   methods: {
+    // firestore関連の関数
+    checkUserLogin() {
+      if (this.user !== null) {
+        this.userName = this.user.displayName
+        this.userDataRef = doc(db, "users", this.userName)
+      } else {
+        this.userName = "未ログイン"
+        this.userDataRef = ""
+        console.log("ログインしてください。")
+      }
+    },
+    userSnapGet: async function () {
+      this.userSnap = await getDoc(this.userDataRef)
+      this.userData = await this.userSnap.data()
+    },
+    setEventsField() {
+      if (!("events" in this.userData)) {
+        setDoc(
+          this.userDataRef,
+          {
+            events: [],
+          },
+          { merge: true }
+        )
+        console.log("firestoreにeventsフィールルドを作成しました。")
+      } else {
+        console.log(
+          "すでにこのユーザはFirestore内にeventsフィールドを持っています。"
+        )
+      }
+    },
+    displayFirestoreData() {
+      this.events = this.userData.events
+      this.Jobs = this.userData.jobs
+    },
+    haveJobsData() {
+      if (this.Jobs.length === 0) {
+        return true
+      } else {
+        return false
+      }
+    },
+    // カレンダー機能関連の関数
     getStartDate() {
       let date = moment(this.currentDate).startOf("month")
       const youbiNum = date.day()
@@ -398,6 +345,7 @@ export default {
         this.weeklyCalendarButton[index] = true
       }
     },
+    // シフト登録機能関連の関数
     registerShift() {
       let eventsLength = this.events.length
       this.events.push({
@@ -407,8 +355,19 @@ export default {
         end: this.shiftEndAt,
         color: "blue",
       })
+      this.addShiftToFirebase()
+    },
+    async addShiftToFirebase() {
+      await updateDoc(this.userDataRef, {
+        events: this.events,
+      })
+    },
+    convertTime(data) {
+      const time = moment(data).format("HH:mm")
+      return time
     },
   },
+
   computed: {
     calendars() {
       return this.getCalendar()
@@ -429,14 +388,21 @@ export default {
       })
     },
   },
+  async created() {
+    this.checkUserLogin()
+    await this.userSnapGet()
+    await this.setEventsField()
+    this.displayFirestoreData()
+  },
 }
 </script>
 
-<style>
+<style scoped>
 .content {
   margin: 2em auto;
   width: 90%;
   left: 30px;
+  text-align: center;
 }
 .button-area {
   margin: 0.5em 0;
@@ -449,6 +415,7 @@ export default {
   max-width: 900px;
   border-top: 1px solid #e0e0e0;
   font-size: 0.8em;
+  margin: auto;
 }
 .calendar-youbi {
   flex: 1;
@@ -521,5 +488,21 @@ export default {
   margin-right: -30px;
   font-size: 10px;
   top: -5px;
+}
+.display-detailCalendar {
+  position: relative;
+  z-index: 1;
+}
+.calendar-event-detail_title {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.calendar-event-detail {
+  color: white;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
 }
 </style>

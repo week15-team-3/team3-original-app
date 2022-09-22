@@ -8,24 +8,32 @@
         </div>
         <h1>Calendar</h1>
       </div>
-
-      <div id="firebaseui-auth-container"></div>
     </div>
 
     <div v-else>
       <div class="container">
         <h2>{{ showUser.name }}<br />さん、こんにちは</h2>
         <div class="loginform">
-          <button @click="SignOut" class="loginbutton">ログアウト</button>
+          <button @click="SignOut" class="loginbutton">Logout</button>
         </div>
-        <nav>
-          <router-link to="/maincalendar">calendar</router-link>
-        </nav>
-        <router-view />
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="header-button">
+    <div v-if="logInOut === false">
+      <div class="loginform-header">
+        <button @click="SignIn" class="loginbutton-header">Login</button>
       </div>
     </div>
 
-    <!-- <ul class="back-bubbles">
+    <div v-else>
+      <div class="loginform-header">
+        <button @click="SignOut" class="loginbutton-header">Logout</button>
+      </div>
+    </div>
+
+     <ul class="back-bubbles">
       <li></li>
       <li></li>
       <li></li>
@@ -37,7 +45,7 @@
       <li></li>
       <li></li>
     </ul> -->
-  </div>
+  <!-- </div>  -->
 </template>
 
 <script>
@@ -148,10 +156,10 @@ export default {
 
 .wrapper {
   background: #50a3a2;
-  background: -webkit-linear-gradient(top, left, #608a8a 0%, #455f54 100%);
-  background: -moz-linear-gradient(top, left, #50a3a6 0%, #53e3a6 100%);
-  background: -o-linear-gradient(top, left, #50a3a6 0%, #53e3a6 100%);
-  background: linear-gradient(to bottom right, #50a3a6 0%, #53e3a6 100%);
+  background: -webkit-linear-gradient(top, left, #6bb6d9 0%, #62aacb 100%);
+  background: -moz-linear-gradient(top, left, #3693be 0%, #46a3ce 100%);
+  background: -o-linear-gradient(top, left, #5da1c0 0%, #99c7dd 100%);
+  background: linear-gradient(to bottom right, #65b1d4 0%, #98cbe2 100%);
   /* background: black; */
 
   position: absolute;
@@ -183,32 +191,6 @@ export default {
   position: relative;
   z-index: 2;
 }
-/* .input {
-  display: block;
-  appearance: none;
-  outline: none;
-  border: 1px solid fade(white, 40px);
-  background-color: fade(white, 40px);
-  width: 240px;
-
-  border-radius: 3px;
-  padding: 15px;
-  margin: 0 auto 10px auto;
-  display: block;
-  text-align: center;
-  font-size: 18px;
-  color: white;
-
-  transition-duration: 0.25s;
-  font-weight: 300;
-}
-.input:hover {
-  background-color: fade(white, 40%);
-}
-.input:focus {
-  background-color: white;
-  width: 300px;
-} */
 
 .loginbutton {
   appearance: none;
@@ -225,6 +207,11 @@ export default {
 }
 .loginbutton:hover {
   background-color: rgb(202, 202, 204);
+}
+
+.header-button {
+  position: fixed;
+  z-index: 10;
 }
 
 .back-bubbles {

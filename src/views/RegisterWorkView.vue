@@ -13,7 +13,9 @@
     </div>
     <button class="register-button" @click="registerWork">バイト先を登録</button
     ><br />
-    <router-link to="/mainCalendar">カレンダーへ戻る</router-link>
+    <router-link id="router-link" to="/mainCalendar"
+      >カレンダーへ戻る</router-link
+    >
     <h3>{{ userName }}さんのバイト先一覧</h3>
     <div class="job-container" v-for="(Job, index) in Jobs" :key="index">
       <div class="job-display-name">{{ Job.name }}</div>
@@ -99,10 +101,54 @@ export default {
 </script>
 
 <style scoped>
+h1 {
+  padding: 25px 0;
+}
 .content {
   text-align: center;
 }
+.job-input-area {
+  height: 100px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+
+  margin-bottom: 25px;
+}
+button {
+  background: #219ddd;
+  border-radius: 10px;
+  padding: 0em 1em;
+  margin: auto;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 27px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  color: #ffffff;
+
+  border: none;
+  box-shadow: 0 0px 10px 0 rgba(0, 0, 0, 0.5);
+}
 .job-container {
-  border: 3px solid;
+  margin: auto;
+  margin-top: 5px;
+  width: 70%;
+  background-color: #80cdf3;
+  color: white;
+
+  border-radius: 10px;
+}
+#router-link:visited {
+  color: black;
+}
+h3 {
+  padding: 25px 0;
 }
 </style>

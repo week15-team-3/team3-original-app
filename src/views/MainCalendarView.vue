@@ -3,11 +3,12 @@
 
 <template>
   <div class="content">
-    <h1>{{ userName }}さんのシフトカレンダー</h1>
-    <h2>{{ displayMonth }}</h2>
+    <h1 id="title">{{ userName }}さんのシフトカレンダー</h1>
+    <hr id="title-underline" />
     <div class="button-area">
-      <button @click="prevMonth">前の月</button>
-      <button @click="nextMonth">次の月</button>
+      <button id="prev-month-button" @click="prevMonth">前の月</button>
+      <h2 id="display-month">{{ displayMonth }}</h2>
+      <button id="next-month-button" @click="nextMonth">次の月</button>
     </div>
     <div class="calendar">
       <div class="calendar-weekly">
@@ -43,7 +44,12 @@
           </div>
         </div>
 
-        <button @click="weeklyCalendarButtonChange(index)">上の週の詳細</button>
+        <button
+          class="display-detail-button"
+          @click="weeklyCalendarButtonChange(index)"
+        >
+          上の週の詳細
+        </button>
 
         <div
           class="weekly-calendar-frame calendar-weekly"
@@ -89,18 +95,15 @@
       </div>
     </div>
     <div class="register-shift">
-      <h2>シフトの登録</h2>
+      <h2 id="register-shift-title">シフトの登録</h2>
       <div class="shift-input-area">
         <div class="shift_name-input-area">
-          <!-- シフトの名前(メモ)：<input
-            class="shift_name-input-field"
-            type="text"
-            v-model="shiftName"
-          /> -->
-          バイト先：
-          <div v-if="haveJobsData()">
+          <div class="shift-input-area-title">バイト先：</div>
+          <div id="shift-input-area_noLogin" v-if="haveJobsData()">
             バイト先が登録されていません<br />
-            <router-link to="/registerWork">バイト先を登録</router-link>
+            <router-link class="register-job-link" to="/registerWork"
+              >バイト先を登録</router-link
+            >
           </div>
           <select v-else class="shift_name-input-field" v-model="shiftName">
             <option v-for="job in Jobs" :key="job.id">{{ job.name }}</option>
@@ -108,24 +111,28 @@
         </div>
         <div v-if="haveJobsData()"></div>
         <div v-else>
-          <div class="shift_startTime-input-area">
-            シフト開始時刻：<input
+          <div class="shift_startTime-input-area shift_Time-input-area">
+            <div class="shift-input-area-title">シフト開始時刻：</div>
+            <input
               class="shift_startTime-input-field"
               type="datetime-local"
               v-model="shiftStartAt"
             />
           </div>
-          <div class="shift_endTime-input-area">
-            シフト終了時刻：<input
+          <div class="shift_endTime-input-area shift_Time-input-area">
+            <div class="shift-input-area-title">シフト終了時刻：</div>
+            <input
               class="shift_endTime-input-field"
               type="datetime-local"
               v-model="shiftEndAt"
             />
           </div>
-          <button class="register-shift" @click="registerShift">
+          <button class="register-shift-button" @click="registerShift">
             シフトを登録</button
           ><br />
-          <router-link to="/registerWork">バイト先の登録・閲覧</router-link>
+          <router-link class="register-job-link" to="/registerWork"
+            >バイト先の登録・閲覧</router-link
+          >
         </div>
       </div>
     </div>
@@ -404,8 +411,60 @@ export default {
   left: 30px;
   text-align: center;
 }
+#title {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 39px;
+
+  color: #000000;
+
+  padding-top: 45px;
+}
+#title-underline {
+  margin: auto;
+  width: 80%;
+
+  border: 2px solid #000000;
+}
+#display-month {
+  width: 236px;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 39px;
+}
+button {
+  background: #219ddd;
+  border-radius: 10px;
+  padding: 0em 1em;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 27px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  color: #ffffff;
+
+  border: none;
+  box-shadow: 0 0px 10px 0 rgba(0, 0, 0, 0.5);
+}
+button:active {
+  box-shadow: none;
+}
 .button-area {
+  display: flex;
+  justify-content: center;
   margin: 0.5em 0;
+  padding-top: 34px;
+  padding-bottom: 15px;
 }
 .button {
   padding: 4px 8px;
@@ -413,7 +472,7 @@ export default {
 }
 .calendar {
   max-width: 900px;
-  border-top: 1px solid #e0e0e0;
+  border: 1px solid #e0e0e0;
   font-size: 0.8em;
   margin: auto;
 }
@@ -428,10 +487,16 @@ export default {
   border-left: 1px solid #e0e0e0;
   /* background-color: black; */
 }
+.display-detail-button {
+  margin: auto;
+  margin-bottom: 2px;
+  margin-top: 2px;
+}
 .calendar-daily {
   flex: 1;
   min-height: 125px;
   border-right: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
   border-bottom: 1px solid #e0e0e0;
   margin-right: -1px;
 }
@@ -452,7 +517,40 @@ export default {
   padding-left: 4px;
 }
 .register-shift {
-  border: solid 3px;
+  margin: auto;
+  margin-top: 74px;
+  background: rgba(33, 157, 221, 0.5);
+  border-radius: 10px;
+  width: 386px;
+  height: 315px;
+
+  color: white;
+}
+#register-shift-title {
+  padding-top: 10px;
+}
+.shift-input-area {
+  margin-top: 29px;
+}
+.shift_name-input-area {
+  display: flex;
+  justify-content: center;
+}
+.shift_Time-input-area {
+  margin-top: 26px;
+
+  display: flex;
+  justify-content: center;
+}
+.register-shift-button {
+  margin: auto;
+  margin-top: 23px;
+}
+.register-job-link {
+  margin-top: 20px;
+}
+.register-job-link:visited {
+  color: white;
 }
 .weekly-calendar-frame {
   border-bottom: solid 1px;

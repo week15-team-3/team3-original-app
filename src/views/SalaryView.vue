@@ -1,19 +1,20 @@
 <template>
   <div class="content">
-    <h1>給料</h1>
     <div class="user-title">
       <button @click="prevMonth">前の月</button>
       <h2>{{ displayMonth }}の{{ userName }}さんの給料</h2>
       <button @click="nextMonth">次の月</button>
     </div>
-    <ul class="salary_for-each">
-      <li v-for="job in Jobs" :key="job.id">
-        {{ job.name }}：時給（{{ job.wage }}円）×働いた時間（{{
-          job.hours
-        }}h）＝{{ Math.trunc(job.wage * job.hours) }}円
-      </li>
-    </ul>
-    <h2>合計：{{ computeTotalWage }}円</h2>
+    <div id="salary_for-each-area">
+      <ul class="salary_for-each">
+        <li v-for="job in Jobs" :key="job.id">
+          {{ job.name }}：時給（{{ job.wage }}円）×働いた時間（{{
+            job.hours
+          }}h）＝{{ Math.trunc(job.wage * job.hours) }}円
+        </li>
+      </ul>
+    </div>
+    <h2 id="total-salary">合計：{{ computeTotalWage }}円</h2>
   </div>
 </template>
 
@@ -136,17 +137,75 @@ export default {
 </script>
 
 <style scoped>
+button {
+  background: #219ddd;
+  border-radius: 10px;
+  padding: 0em 1em;
+  margin: 0 37px;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 27px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  color: #ffffff;
+
+  border: none;
+  box-shadow: 0 0px 10px 0 rgba(0, 0, 0, 0.5);
+}
 .content {
   display: block;
   text-align: center;
 }
 .user-title {
   display: flex;
+  justify-content: center;
+
+  padding-top: 45px;
+  padding-bottom: 45px;
+}
+#salary_for-each-area {
+  width: 676px;
+  margin: auto;
+  padding-top: 45px;
+  padding-bottom: 45px;
+
+  background: rgba(0, 34, 100, 0.5);
+  border-radius: 10px;
+
+  color: white;
 }
 .salary_for-each {
   display: table;
   text-align: left;
   margin-left: auto;
   margin-right: auto;
+
+  line-height: 40px;
+}
+#total-salary {
+  color: #79d06a;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 100%;
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+
+  height: 110px;
+  width: 70%;
+  margin: auto;
+  margin-top: 45px;
+
+  background: rgba(233, 246, 223, 0.2);
+  border-radius: 10px;
 }
 </style>

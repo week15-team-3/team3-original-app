@@ -28,7 +28,8 @@
 }
 
 .main-container {
-  background-color: antiquewhite;
+  color: white;
+  background-color: #219ddd;
   box-shadow: 0px -1px 10px 8px #777777;
   position: fixed;
   top: 0;
@@ -53,12 +54,12 @@ nav {
 nav a {
   font-weight: bold;
   text-decoration: none;
-  color: #2c3e50;
+  color: white;
   margin: 0 5px 0 5px;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  color: #8ff8fd;
 }
 
 .router-views {
